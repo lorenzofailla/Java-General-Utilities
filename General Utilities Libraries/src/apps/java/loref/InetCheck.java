@@ -81,7 +81,7 @@ public class InetCheck {
 
     }
 
-    private void init() {
+    public void init() {
 
 	mainLoop.start();
 
@@ -110,7 +110,7 @@ public class InetCheck {
 
 		if (inetConnectionStatus) {
 
-		    // la connessione internet è presente
+		    // la connessione internet ï¿½ presente
 
 		    // se ci sono le condizioni, notifica la variazione dello
 		    // stato della connessione tramite il listener
@@ -126,7 +126,7 @@ public class InetCheck {
 
 		} else {
 
-		    // la connessione internet non è presente
+		    // la connessione internet non ï¿½ presente
 
 		    // se ci sono le condizioni, notifica la variazione dello
 		    // stato della connessione tramite il listener
