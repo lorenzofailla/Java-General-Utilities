@@ -14,6 +14,8 @@ public class FirebaseDBUpdateLogger implements CompletionListener {
 	private String subject=DEFAULT_SUBJECT;
 	private String logTopic=DEFAULT_LOG_TOPIC;
 	
+	private boolean negativeResultsOnly=false; 
+	
 	public FirebaseDBUpdateLogger(String subject) {
 		this.subject=subject;
 
@@ -24,11 +26,18 @@ public class FirebaseDBUpdateLogger implements CompletionListener {
 		this.subject=subject;
 
 	}
+	
+	public FirebaseDBUpdateLogger(String logTopic, String subject, boolean negativeResultsOnly) {
+		this.logTopic=logTopic;
+		this.subject=subject;
+		this.negativeResultsOnly=negativeResultsOnly;
+	}
 
+	
 	@Override
 	public void onComplete(DatabaseError error, DatabaseReference ref) {
 		
-		if(error==null) {
+		if(error==null && !negativeResultsOnly) {
 	
 			printLog(logTopic, subject + " successfully updated");
 						
