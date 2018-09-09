@@ -30,6 +30,8 @@
 
 package apps.java.loref;
 
+import static apps.java.loref.GeneralUtilitiesLibrary.parseShellCommand;
+
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -92,21 +94,7 @@ public class GeneralUtilitiesLibrary {
 		shellCommand = Runtime.getRuntime().exec(command);
 
 	}
-
-	public static String getUptime() {
-
-		try {
-
-			return parseShellCommand("uptime");
-
-		} catch (IOException | InterruptedException e) {
-
-			return null;
-
-		}
-
-	}
-
+		
 	public static String parseHttpRequest(String httpRequest) {
 
 		InputStreamReader inputStreamReader;
@@ -351,11 +339,6 @@ public class GeneralUtilitiesLibrary {
 		
 	}
 	
-	public static double getFreeSpace(String mountPosition) {
-		
-		long freeSpaceBytes = new File(mountPosition).getFreeSpace();
-		return (double) freeSpaceBytes / 1024.0 / 1024.0;
-		
-	}
+	
 	
 }
