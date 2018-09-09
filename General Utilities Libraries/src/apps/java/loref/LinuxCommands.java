@@ -59,15 +59,15 @@ public class LinuxCommands {
 
     public static double getFreeSpace(String mountPosition) {
 
-	long freeSpaceBytes = new File(mountPosition).getFreeSpace();
-	return (double) freeSpaceBytes / 1024.0 / 1024.0;
+	long reply = new File(mountPosition).getUsableSpace();
+	return (double) reply / 1024.0 / 1024.0;
 
     }
     
     public static double getTotalSpace(String mountPosition) {
 
-	long freeSpaceBytes = new File(mountPosition).getUsableSpace();
-	return (double) freeSpaceBytes / 1024.0 / 1024.0;
+	long reply = new File(mountPosition).getTotalSpace();
+	return (double) reply / 1024.0 / 1024.0;
 
     }
 
