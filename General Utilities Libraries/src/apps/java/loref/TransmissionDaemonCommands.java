@@ -30,76 +30,86 @@
 
 package apps.java.loref;
 
-import java.io.File;
-import java.io.IOException;
 import static apps.java.loref.GeneralUtilitiesLibrary.parseShellCommand;
-import static apps.java.loref.GeneralUtilitiesLibrary.printErrorLog;
-import static apps.java.loref.GeneralUtilitiesLibrary.parseHttpRequest;
+import static apps.java.loref.GeneralUtilitiesLibrary.execShellCommand;
 
-public class LinuxCommands {
 
-    public static final String PUBLIC_IP_COMMAND = "curl ifconfig.co";
-    public static final String LOCAL_IP_COMMAND = "hostname -I";
+import java.io.IOException;
 
-    public static final String ERROR = "[error]";
-
-    public static String getUptime() {
-
-	try {
-
-	    return parseShellCommand("uptime").replaceAll("[\n\r]", "");
-
-	} catch (IOException | InterruptedException e) {
-
-	    printErrorLog(e);
-	    return ERROR;
-
-	}
-
-    }
-
-    public static String getLocalIPAddresses() {
-
-	try {
-
-	    return parseShellCommand(LOCAL_IP_COMMAND).replaceAll("[\r\n]", "");
-
-	} catch (IOException | InterruptedException e) {
-
-	    printErrorLog(e);
-	    return ERROR;
-
-	}
-
-    }
-
-    public static String getPublicIPAddresses() {
-
-	try {
-
-	    return parseShellCommand(PUBLIC_IP_COMMAND).replaceAll("[\r\n]", "");
-
-	} catch (IOException | InterruptedException e) {
-
-	    printErrorLog(e);
-	    return ERROR;
-
-	}
-
-    }
-
-    public static double getFreeSpace(String mountPosition) {
-
-	long reply = new File(mountPosition).getUsableSpace();
-	return (double) reply / 1024.0 / 1024.0;
-
-    }
+public class TransmissionDaemonCommands {
     
-    public static double getTotalSpace(String mountPosition) {
+    public static String getTorrentsList() {
 
-	long reply = new File(mountPosition).getTotalSpace();
-	return (double) reply / 1024.0 / 1024.0;
+	try {
+
+	    return parseShellCommand("transmission-remote -n transmission:transmission -l");
+
+	} catch (IOException | InterruptedException e) {
+
+	    return "error - " + e.getMessage();
+
+	}
 
     }
-    
+
+    public static String startTorrent(String torrentID) {
+
+	try {
+
+	    execShellCommand("transmission-remote -n transmission:transmission -t" + torrentID + " -s");
+	    return "torrent id: " + torrentID + "started.";
+
+	} catch (IOException e) {
+	    
+	    return "error - " + e.getMessage();
+
+	}
+
+    }
+
+    public static String stopTorrent(String torrentID) {
+
+	try {
+
+	    execShellCommand("transmission-remote -n transmission:transmission -t" + torrentID + " -S");
+	    return "torrent id: " + torrentID + "stopped.";
+	    
+	} catch (IOException e) {
+	    
+	    return "error - " + e.getMessage();
+	    
+	}
+
+    }
+
+    public static String removeTorrent(String torrentID) {
+
+	try {
+
+	    execShellCommand("transmission-remote -n transmission:transmission -t" + torrentID + " -r");
+	    return "torrent id: " + torrentID + "removed.";
+	    
+	} catch (IOException e) {
+
+	    return "error - " + e.getMessage();
+	    
+	}
+
+    }
+
+    public static String addTorrent(String torrentID) {
+
+	try {
+
+	    execShellCommand("transmission-remote -n transmission:transmission -a " + torrentID);
+	    return "torrent id: " + torrentID + "added.";
+	    
+	} catch (IOException e) {
+
+	    return "error - " + e.getMessage();
+	    
+	}
+
+    }
+
 }

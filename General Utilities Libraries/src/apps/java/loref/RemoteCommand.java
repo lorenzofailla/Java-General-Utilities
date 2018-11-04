@@ -19,7 +19,7 @@ public class RemoteCommand {
     }
 
     public RemoteCommand(String stringToParse, String replyTo) {
-
+	
 	String[] lines = stringToParse.split("[&]");
 
 	if (lines.length != 2) {
