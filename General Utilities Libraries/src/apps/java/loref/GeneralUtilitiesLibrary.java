@@ -45,302 +45,368 @@ import java.net.URLConnection;
 import java.text.SimpleDateFormat;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Set;
 import java.util.zip.DataFormatException;
 import java.util.zip.Deflater;
 import java.util.zip.Inflater;
+
+import org.json.JSONObject;
 
 import com.google.api.client.util.Base64;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
 import com.google.firebase.auth.FirebaseCredentials;
 
+import static apps.java.loref.LogUtilities.exceptionLog_REDXTERM;
+
+@SuppressWarnings({ "javadoc", "unused" })
 public class GeneralUtilitiesLibrary {
 
-    public static final long MAX_LOG_CONTENT_LENGTH = 128;
+	public static final long MAX_LOG_CONTENT_LENGTH = 128;
 
-    public static void sleepSafe(long time) {
+	public static void sleepSafe(long time) {
 
-	try {
-	    Thread.sleep(time);
-	} catch (InterruptedException e) {
-	}
+		try {
 
-    }
+			Thread.sleep(time);
 
-    public static String parseShellCommand(String command) throws IOException, InterruptedException {
+		} catch (InterruptedException e) {
 
-	StringBuffer output = new StringBuffer();
+			exceptionLog_REDXTERM(GeneralUtilitiesLibrary.class, e);
 
-	Process shellCommand;
-
-	shellCommand = Runtime.getRuntime().exec(command);
-	shellCommand.waitFor();
-
-	BufferedReader reader = new BufferedReader(new InputStreamReader(shellCommand.getInputStream()));
-
-	String line = "";
-
-	while ((line = reader.readLine()) != null) {
-
-	    output.append(line + "\n");
+		}
 
 	}
 
-	return output.toString();
-    }
+	public static String parseShellCommand(String command) throws IOException, InterruptedException {
 
-    public static void execShellCommand(String command) throws IOException {
+		StringBuffer output = new StringBuffer();
 
-	Process shellCommand;
+		Process shellCommand;
 
-	shellCommand = Runtime.getRuntime().exec(command);
+		shellCommand = Runtime.getRuntime().exec(command);
+		shellCommand.waitFor();
 
-    }
+		BufferedReader reader = new BufferedReader(new InputStreamReader(shellCommand.getInputStream()));
 
-    public static String parseHttpRequest(String httpRequest) {
+		String line = "";
 
-	InputStreamReader inputStreamReader;
-	StringBuilder stringBuilder = new StringBuilder();
-	
-	try {
-	    
-	    URL url = new URL(httpRequest);
-	    URLConnection connection = url.openConnection();
-	    connection.setConnectTimeout(5000);
-	    connection.connect();
-	    
-	    inputStreamReader = new InputStreamReader(connection.getInputStream());
+		while ((line = reader.readLine()) != null) {
 
-	    BufferedReader buf = new BufferedReader(inputStreamReader);
-	    String line;
-	    while ((line = buf.readLine()) != null) {
-		stringBuilder.append(line);
-		stringBuilder.append("\n");
-	    }
+			output.append(line + "\n");
+			
+		}
 
-	    return stringBuilder.toString();
-
-	} catch (IOException e) {
-
-	    return "Error - " + e.getMessage();
-	}
-
-    }
-
-    public static byte[] getFileAsBytes(String fileLocation) {
-
-	FileInputStream in;
-
-	try {
-	    in = new FileInputStream(fileLocation);
-	} catch (FileNotFoundException e) {
-	    return new byte[0];
-	}
-
-	ByteArrayOutputStream out = new ByteArrayOutputStream();
-
-	int data;
-
-	try {
-	    while ((data = in.read()) != -1) {
-
-		out.write(data);
-	    }
-
-	    out.flush();
-	    in.close();
-
-	    return out.toByteArray();
-	} catch (IOException e) {
-	    return new byte[0];
-	}
-
-    }
-
-    public static String readPlainTextFromFile(File f) {
-
-	FileInputStream in;
-	try {
-	    in = new FileInputStream(f);
-
-	    ByteArrayOutputStream out = new ByteArrayOutputStream();
-
-	    int data;
-	    while ((data = in.read()) != -1) {
-
-		out.write(data);
-	    }
-
-	    out.flush();
-	    in.close();
-
-	    return out.toString();
-
-	} catch (FileNotFoundException e) {
-	    return "ERROR: File not found";
-	} catch (IOException e) {
-	    return "ERROR: File not readable";
-	}
-
-    }
-
-    public static RemoteCommand parseLocalCommand(String s) {
-
-	String[] lines = s.split("\n");
-
-	if (lines.length == 3) {
-	    return new RemoteCommand(lines[0], lines[1], lines[2]);
-	} else
-	    return null;
-
-    }
-
-    public static String getTimeStamp(String format) {
-
-	GregorianCalendar gc = new GregorianCalendar();
-	SimpleDateFormat sdf = new SimpleDateFormat(format);
-	return sdf.format(gc.getTime());
-
-    }
-
-    public static String getTimeStamp() {
-
-	return String.format("%d", System.currentTimeMillis());
-
-    }
-
-    public static void printLog(String logTopic, String logContent) {
-
-	String content = logContent.replace("\n", "\\n");
-	long contentLength = logContent.length();
-
-	if (contentLength > MAX_LOG_CONTENT_LENGTH) {
-
-	    content = logContent.substring(0, (int) MAX_LOG_CONTENT_LENGTH) + String.format("... (lenght=%d)", contentLength);
+		return output.toString();
 
 	}
 
-	System.out.println(getTimeStamp("yyyyMMdd-HHmmssSSS") + ";" + logTopic + ";" + "[" + content + "]");
+	public static void execShellCommand(String command) throws IOException {
 
-    }
+		Process shellCommand;
 
-    public static void printErrorLog(Exception e) {
-
-	printLog("ERROR", e.getMessage());
-
-    }
-
-    public static boolean connectToFirebaseDatabase(String locationOfJSONAuthFile, String databaseURL) {
-
-	File jsonAuthFileLocation = new File(locationOfJSONAuthFile);
-	try {
-	    FileInputStream serviceAccount = new FileInputStream(jsonAuthFileLocation);
-	    FirebaseOptions options = new FirebaseOptions.Builder().setCredential(FirebaseCredentials.fromCertificate(serviceAccount)).setDatabaseUrl(databaseURL).build();
-
-	    FirebaseApp.initializeApp(options);
-
-	    serviceAccount.close();
-
-	    return true;
-
-	} catch (IOException e) {
-
-	    System.out.println("Exception when tried to connect to Firebase: " + e.getMessage());
-	    return false;
+		shellCommand = Runtime.getRuntime().exec(command);
 
 	}
 
-    }
+	public static String parseHttpRequest(String httpRequest) {
 
-    public static byte[] ipAddressFromString(String ipAddress) {
+		InputStreamReader inputStreamReader;
+		StringBuilder stringBuilder = new StringBuilder();
 
-	String[] address = ipAddress.split("[.]");
+		try {
 
-	if (address.length == 4) {
+			URL url = new URL(httpRequest);
+			URLConnection connection = url.openConnection();
+			connection.setConnectTimeout(5000);
+			connection.connect();
 
-	    byte[] result = new byte[4];
-	    for (int i = 0; i < address.length; i++) {
-		result[i] = (byte) Integer.parseInt(address[i]);
-	    }
+			inputStreamReader = new InputStreamReader(connection.getInputStream());
 
-	    return result;
+			BufferedReader buf = new BufferedReader(inputStreamReader);
+			String line;
+			while ((line = buf.readLine()) != null) {
+				stringBuilder.append(line);
+				stringBuilder.append("\n");
+			}
 
-	} else {
+			return stringBuilder.toString();
 
-	    return new byte[4];
+		} catch (IOException e) {
 
-	}
-
-    }
-
-    public static byte[] compress(byte[] data) {
-	Deflater deflater = new Deflater();
-	deflater.setInput(data);
-	ByteArrayOutputStream outputStream = new ByteArrayOutputStream(data.length);
-	deflater.finish();
-	byte[] buffer = new byte[1024];
-
-	while (!deflater.finished()) {
-	    int count = deflater.deflate(buffer); // returns the generated
-	    // code... index
-	    outputStream.write(buffer, 0, count);
-	}
-
-	try {
-	    outputStream.close();
-	    byte[] output = outputStream.toByteArray();
-
-	    return output;
-	} catch (IOException e) {
-	    return new byte[0];
-	}
-
-    }
-
-    public static byte[] decompress(byte[] data) throws IOException, DataFormatException {
-
-	Inflater inflater = new Inflater();
-	inflater.setInput(data);
-	ByteArrayOutputStream outputStream = new ByteArrayOutputStream(data.length);
-
-	byte[] buffer = new byte[1024];
-
-	while (!inflater.finished()) {
-
-	    int count = inflater.inflate(buffer);
-	    outputStream.write(buffer, 0, count);
-	}
-
-	outputStream.close();
-	byte[] output = outputStream.toByteArray();
-
-	return output;
-    }
-
-    public static HashMap<String, String> parseMeta(String code) {
-
-	HashMap<String, String> result = new HashMap<>();
-
-	String[] data = code.split("&");
-	for (String datum : data) {
-
-	    String[] parse = datum.split("=");
-
-	    if (parse.length != 2)
-		continue;
-
-	    result.put(parse[0], parse[1]);
+			return "Error - " + e.getMessage();
+		}
 
 	}
 
-	return result;
+	public static byte[] getFileAsBytes(String fileLocation) {
 
-    }
+		FileInputStream in;
 
-    public static String encode(String raw) {
+		try {
+			in = new FileInputStream(fileLocation);
+		} catch (FileNotFoundException e) {
+			return new byte[0];
+		}
 
-	return Base64.encodeBase64String(compress(raw.getBytes()));
+		ByteArrayOutputStream out = new ByteArrayOutputStream();
 
-    }
+		int data;
+
+		try {
+			while ((data = in.read()) != -1) {
+
+				out.write(data);
+			}
+
+			out.flush();
+			in.close();
+
+			return out.toByteArray();
+		} catch (IOException e) {
+			return new byte[0];
+		}
+
+	}
+
+	public static String readPlainTextFromFile(File f) {
+
+		FileInputStream in;
+
+		try {
+
+			in = new FileInputStream(f);
+
+			ByteArrayOutputStream out = new ByteArrayOutputStream();
+
+			int data;
+			while ((data = in.read()) != -1) {
+
+				out.write(data);
+			}
+
+			out.flush();
+			in.close();
+
+			return out.toString();
+
+		} catch (FileNotFoundException e) {
+
+			exceptionLog_REDXTERM(GeneralUtilitiesLibrary.class, e);
+			return "ERROR: File not found";
+
+		} catch (IOException e) {
+
+			exceptionLog_REDXTERM(GeneralUtilitiesLibrary.class, e);
+			return "ERROR: File not readable";
+		}
+
+	}
+
+	public static String[] readLinesFromFile(File f) {
+
+		String in = readPlainTextFromFile(f);
+
+		if (!in.startsWith("ERROR")) {
+			// input file reading did not succeed
+
+			// returns a string array on each \n
+			return in.split("[\n]");
+
+		} else {
+			// input file reading did not succeed
+
+			// returns an empty string array
+			return new String[0];
+
+		}
+
+	}
+
+	public static RemoteCommand parseLocalCommand(String s) {
+
+		String[] lines = s.split("\n");
+
+		if (lines.length == 3) {
+			return new RemoteCommand(lines[0], lines[1], lines[2]);
+		} else
+			return null;
+
+	}
+
+	public static String getTimeStamp(String format) {
+
+		GregorianCalendar gc = new GregorianCalendar();
+		SimpleDateFormat sdf = new SimpleDateFormat(format);
+		return sdf.format(gc.getTime());
+
+	}
+
+	public static String getTimeStamp() {
+
+		return String.format("%d", System.currentTimeMillis());
+
+	}
+
+	public static void printLog(String logTopic, String logContent) {
+
+		String content = logContent.replace("\n", "\\n");
+		long contentLength = logContent.length();
+
+		if (contentLength > MAX_LOG_CONTENT_LENGTH) {
+
+			content = logContent.substring(0, (int) MAX_LOG_CONTENT_LENGTH)
+					+ String.format("... (lenght=%d)", contentLength);
+
+		}
+
+		System.out.println(getTimeStamp("yyyyMMdd-HHmmssSSS") + ";" + logTopic + ";" + "[" + content + "]");
+
+	}
+
+	public static void printErrorLog(Exception e) {
+
+		printLog("ERROR", e.getMessage());
+
+	}
+
+	public static boolean connectToFirebaseDatabase(String locationOfJSONAuthFile, String databaseURL) {
+
+		File jsonAuthFileLocation = new File(locationOfJSONAuthFile);
+		try {
+			FileInputStream serviceAccount = new FileInputStream(jsonAuthFileLocation);
+			FirebaseOptions options = new FirebaseOptions.Builder()
+					.setCredential(FirebaseCredentials.fromCertificate(serviceAccount)).setDatabaseUrl(databaseURL)
+					.build();
+
+			FirebaseApp.initializeApp(options);
+
+			serviceAccount.close();
+
+			return true;
+
+		} catch (IOException e) {
+
+			exceptionLog_REDXTERM(GeneralUtilitiesLibrary.class, e);
+			return false;
+
+		}
+
+	}
+
+	public static byte[] ipAddressFromString(String ipAddress) {
+
+		String[] address = ipAddress.split("[.]");
+
+		if (address.length == 4) {
+
+			byte[] result = new byte[4];
+			for (int i = 0; i < address.length; i++) {
+				result[i] = (byte) Integer.parseInt(address[i]);
+			}
+
+			return result;
+
+		} else {
+
+			return new byte[4];
+
+		}
+
+	}
+
+	public static byte[] compress(byte[] data) {
+		Deflater deflater = new Deflater();
+		deflater.setInput(data);
+		ByteArrayOutputStream outputStream = new ByteArrayOutputStream(data.length);
+		deflater.finish();
+		byte[] buffer = new byte[1024];
+
+		while (!deflater.finished()) {
+			int count = deflater.deflate(buffer); // returns the generated
+			// code... index
+			outputStream.write(buffer, 0, count);
+		}
+
+		try {
+			outputStream.close();
+			byte[] output = outputStream.toByteArray();
+
+			return output;
+		} catch (IOException e) {
+			return new byte[0];
+		}
+
+	}
+
+	public static byte[] decompress(byte[] data) throws IOException, DataFormatException {
+
+		Inflater inflater = new Inflater();
+		inflater.setInput(data);
+		ByteArrayOutputStream outputStream = new ByteArrayOutputStream(data.length);
+
+		byte[] buffer = new byte[1024];
+
+		while (!inflater.finished()) {
+
+			int count = inflater.inflate(buffer);
+			outputStream.write(buffer, 0, count);
+
+		}
+
+		outputStream.close();
+		byte[] output = outputStream.toByteArray();
+
+		return output;
+	}
+
+	public static HashMap<String, String> parseMeta(String code) {
+
+		HashMap<String, String> result = new HashMap<>();
+
+		String[] data = code.split("&");
+		for (String datum : data) {
+
+			String[] parse = datum.split("=");
+
+			if (parse.length != 2)
+				continue;
+
+			result.put(parse[0], parse[1]);
+
+		}
+
+		return result;
+
+	}
+
+	public static HashMap<String, Object> parseJSON(String code) {
+
+		HashMap<String, Object> result = new HashMap<>();
+		JSONObject input = new JSONObject(code);
+
+		Set<String> keys = input.keySet();
+		for (String key : keys) {
+
+			result.put(key, input.getString(key));
+
+		}
+
+		return result;
+
+	}
+
+	public static String encode(String raw) {
+
+		return Base64.encodeBase64String(raw.getBytes());
+
+	}
+
+	public static String encode(byte[] raw) {
+
+		return Base64.encodeBase64String(raw);
+
+	}
 
 }

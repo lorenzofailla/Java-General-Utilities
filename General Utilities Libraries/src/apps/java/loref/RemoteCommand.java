@@ -120,7 +120,7 @@ public class RemoteCommand {
     }
 
     public String toString() {
-	return String.format("?header=%s&body=%s&replyto=%s\n\r", this.header, this.body, this.replyto);
+	return String.format("?header=%s&body=%s&replyto=%s\n", this.header, this.body, this.replyto);
     }
 
 }

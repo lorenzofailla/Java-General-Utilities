@@ -32,6 +32,7 @@ public class FCMUtilities {
 	    json.put("data", data);
 	    
 	} catch (NullPointerException | JSONException e) {
+	    	    
 
 	}
 

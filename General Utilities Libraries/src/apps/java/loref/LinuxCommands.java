@@ -34,6 +34,7 @@ import java.io.File;
 import java.io.IOException;
 import static apps.java.loref.GeneralUtilitiesLibrary.parseShellCommand;
 import static apps.java.loref.GeneralUtilitiesLibrary.printErrorLog;
+import static apps.java.loref.LogUtilities.exceptionLog_REDXTERM;
 import static apps.java.loref.GeneralUtilitiesLibrary.parseHttpRequest;
 
 public class LinuxCommands {
@@ -66,7 +67,7 @@ public class LinuxCommands {
 
 	} catch (IOException | InterruptedException e) {
 
-	    printErrorLog(e);
+	    exceptionLog_REDXTERM(LinuxCommands.class, e);
 	    return ERROR;
 
 	}
@@ -81,7 +82,7 @@ public class LinuxCommands {
 
 	} catch (IOException | InterruptedException e) {
 
-	    printErrorLog(e);
+	    exceptionLog_REDXTERM(LinuxCommands.class, e);
 	    return ERROR;
 
 	}
@@ -91,14 +92,14 @@ public class LinuxCommands {
     public static double getFreeSpace(String mountPosition) {
 
 	long reply = new File(mountPosition).getUsableSpace();
-	return (double) reply / 1024.0 / 1024.0;
+	return reply / 1024.0 / 1024.0;
 
     }
     
     public static double getTotalSpace(String mountPosition) {
 
 	long reply = new File(mountPosition).getTotalSpace();
-	return (double) reply / 1024.0 / 1024.0;
+	return reply / 1024.0 / 1024.0;
 
     }
     
